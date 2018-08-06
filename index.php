@@ -1,4 +1,8 @@
 <?php
+ini_set('max_execution_time', '0');
+set_time_limit(0);
+ignore_user_abort (true);
+error_reporting(E_ALL);
 require_once ('phpQuery.php');
 require_once('PHPExcel.php');
 require_once('PHPExcel/Writer/Excel5.php');
@@ -137,9 +141,11 @@ function getSinglePage($n,$numPage)
                 $page->setCellValue("D1", "DEAL_PRICE");
                 $page->setCellValue("E1", "CITY_TYPE");
                 $page->setCellValue("F1", "REGION");
-                $page->setCellValue("G1", "1");
-                $page->setCellValue("H1", "1");
+                $page->setCellValue("G1", " ADDRESS");
+                $page->setCellValue("H1", "ADDRESS");
                 $page->setCellValue("I1", "1");
+                $page->setCellValue("J1", "PHONE");
+                $page->setCellValue("K1", "REF");
             }
             if (trim($param[0])=='Квартиры'){
                 $param[0]='2001003000';
@@ -160,32 +166,30 @@ function getSinglePage($n,$numPage)
     }
 }
 
-function getads_avito_www($url,$html)
-{
-    $pattern = "'<div class=\"item.{1,100} id=\"i(?<avito_id>.{7,12})\".*?<h3 .*? href=\"(?<href>.*?)\".*?>(?<title>.*?)</a>.*?<div class=\"about\">(?<price>.*?)<.*?v>(?<details>.*?)<div class=\"date c-2\">(?<data>.*?)</div>'si";
-
-    $titre=preg_match_all($pattern, $html, $ads) ;
-    unset($ads[0]);
-    for ($i=0;$i<count($ads["price"]);$i++)
-    {
-        $ads["price"][$i]=preg_replace('/[^\d]+/', '',$ads["price"][$i]);
-        $ads["href"][$i]="https://www.avito.ru".$ads["href"][$i];
-        $ads["details"][$i]=strip_tags($ads["details"][$i]);
-    }
-    return $ads;
-}
+//function getads_avito_www($url,$html)
+//{
+/*    $pattern = "'<div class=\"item.{1,100} id=\"i(?<avito_id>.{7,12})\".*?<h3 .*? href=\"(?<href>.*?)\".*?>(?<title>.*?)</a>.*?<div class=\"about\">(?<price>.*?)<.*?v>(?<details>.*?)<div class=\"date c-2\">(?<data>.*?)</div>'si";*/
+//
+//    $titre=preg_match_all($pattern, $html, $ads) ;
+//    unset($ads[0]);
+//    for ($i=0;$i<count($ads["price"]);$i++)
+//    {
+//        $ads["price"][$i]=preg_replace('/[^\d]+/', '',$ads["price"][$i]);
+//        $ads["href"][$i]="https://www.avito.ru".$ads["href"][$i];
+//        $ads["details"][$i]=strip_tags($ads["details"][$i]);
+//    }
+//    return $ads;
+//}
 //$mainurl = 'https://m.avito.ru/stavropolskiy_kray/nedvizhimost?';
 //$e = getads_avito_www('https://m.avito.ru/kislovodsk/kvartiry/1-k_kvartira_35_m_23_et._638865793',get_content('https://m.avito.ru/kislovodsk/kvartiry/1-k_kvartira_35_m_23_et._638865793'));
 //var_dump($mainurl,$e);
-getSinglePage(2,1);
-
-//var_dump($href);
-	//get_content($mainurl."&p=$i");
-//file_put_contents('data.php',' '.PHP_EOL,FILE_APPEND);
-//while($i<$max)
-//{
-//    pageParse($mainurl."&p=$i",$n+$elem_in_page*($i-1),$filename);
-//    $n++;
-//    $i++;
-//}
+$t=2;
+$str=1;
+$max = 2200;
+while($t<$max)
+{
+    getSinglePage($t,$str);
+    $t=$t+23;
+    $str++;
+}
 	
