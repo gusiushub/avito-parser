@@ -2,7 +2,7 @@
 ini_set('max_execution_time', '0');
 set_time_limit(0);
 ignore_user_abort (true);
-error_reporting(E_ALL);
+//error_reporting(E_ALL);
 require_once ('phpQuery.php');
 require_once('PHPExcel.php');
 require_once('PHPExcel/Writer/Excel5.php');
@@ -94,13 +94,15 @@ function getSinglePage($n,$numPage)
             foreach ($contents as $content) {
                 $pqContent = pq($content);
                 //$id = 1;
+                $type = $pqContent->find('span.text.text-main')->getString();
                 $desc = $pqContent->find('header.single-item-header.b-with-padding')->getStrings();
                 $param = $pqContent->find('span.param.param-last')->getString();
                 $price = $pqContent->find('span.price-value')->getString();
                 $date = $pqContent->find('div.item-add-date')->getString();
                 $address = $pqContent->find('span.info-text.user-address-text')->getString();
+                $addressString = $address;
                 //$CITY_TYPE = '';
-                var_dump($desc);
+                var_dump($type);
                 $text = $address[0];
 
                 $main_str = $text;
@@ -137,24 +139,26 @@ function getSinglePage($n,$numPage)
                 $page = $objPHPExcel->setActiveSheetIndex(0);
                 $page->setCellValue("A1", "ID");
                 $page->setCellValue("B1", "TYPE_CODE");
-                $page->setCellValue("C1", "DEAL_DATE");
-                $page->setCellValue("D1", "DEAL_PRICE");
-                $page->setCellValue("E1", "CITY_TYPE");
-                $page->setCellValue("F1", "REGION");
-                $page->setCellValue("G1", " ADDRESS");
-                $page->setCellValue("H1", "ADDRESS");
-                $page->setCellValue("I1", "1");
-                $page->setCellValue("J1", "PHONE");
-                $page->setCellValue("K1", "REF");
+                $page->setCellValue("C1", "ABOUT");
+                $page->setCellValue("D1", "DEAL_DATE");
+                $page->setCellValue("E1", "DEAL_PRICE");
+                $page->setCellValue("F1", "CITY_TYPE");
+                $page->setCellValue("G1", "REGION");
+                $page->setCellValue("H1", " ADDRESS");
+//                $page->setCellValue("H1", "ADDRESS");
+//                $page->setCellValue("I1", "1");
+                $page->setCellValue("I1", "PHONE");
+                $page->setCellValue("J1", "REF");
             }
-            if (trim($param[0])=='Квартиры'){
-                $param[0]='2001003000';
-                $PURPOSE_CODE = '204004000000';
-            }
-            if ($param[0]=='Дома, дачи, коттеджи'){
-                $param[0]='2001001000';
-            }
-            $obj = [trim($n), trim($param[0]), $date[0], trim($price[0]),$CITY_TYPE, '26',trim($address[1]),trim($address[0]),'улица',$mob_phone,'https://m.avito.ru' . $tags[$i]];
+//            if (trim($param[0])=='Квартиры'){
+//                $param[0]='2001003000';
+//                $PURPOSE_CODE = '204004000000';
+//            }
+//            if ($param[0]=='Дома, дачи, коттеджи'){
+//                $param[0]='2001001000';
+//            }
+            $obj = [trim($n), trim($param[0]),trim($type[0]), $date[0], trim($price[0]),$CITY_TYPE, '26',trim($addressString[0]),$mob_phone,'https://m.avito.ru' . $tags[$i]];
+            //$obj = [trim($n), trim($param[0]), $date[0], trim($price[0]),$CITY_TYPE, '26',trim($address[1]),trim($address[0]),'улица',$mob_phone,'https://m.avito.ru' . $tags[$i]];
             var_dump($obj);
             $objPHPExcel->getActiveSheet(0)->fromArray($obj, NULL, 'A' . $n);
 
@@ -185,7 +189,7 @@ function getSinglePage($n,$numPage)
 //var_dump($mainurl,$e);
 $t=2;
 $str=1;
-$max = 2200;
+$max = 50;
 while($t<$max)
 {
     getSinglePage($t,$str);
