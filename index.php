@@ -8,14 +8,10 @@ require_once('PHPExcel.php');
 require_once('PHPExcel/Writer/Excel5.php');
 require_once('PHPExcel/IOFactory.php');
 	function get_content($url){
-		
 		define('DOMAIN','m.avito.ru');
 		define('SCHEME','https://');
-		
 		$contentPage = "";
-		//$url = "https://m.avito.ru/stavropolskiy_kray/nedvizhimost?s_trg=3";//kaliningrad/kvartiry/1-k_kvartira_30.6_m_25_et._979450294";
 		$referer = "https://www.yandex.ru/?yclid=".rand(0, 100).rand(0, 100).rand(0, 100).rand(0, 100).rand(0, 100);
-		
 		$headers = [
 			'Host: m.avito.ru',
 			'Upgrade-Insecure-Requests: 1',
@@ -63,10 +59,8 @@ $strMax = 10;
 $pageElement = 50;
 function getSinglePage($n,$numPage)
 {
-    //$mainurl = 'https://m.avito.ru/stavropolskiy_kray/kvartiry/prodam?s_trg=10';
     $mainurl = 'https://m.avito.ru/stavropolskiy_kray/nedvizhimost?';
     $dom = phpQuery::newDocument(get_content($mainurl . "&p=$numPage"));
-//$blocks= $dom->find('article.b-item.js-catalog-item-enum.item-highlight');
     $blocks = $dom->find('section.b-content-main');
 
     foreach ($blocks as $block) {
@@ -87,10 +81,8 @@ function getSinglePage($n,$numPage)
         for ($i = 0; $i < $k; $i++) {
             $domdoc = phpQuery::newDocument(get_content('https://m.avito.ru' . $tags[$i]));
             $contents = $domdoc->find('article.b-single-item');
-            //get_content('https://m.avito.ru'.$tags[$i]);
             $mob_href = $domdoc->find('a.action-show-number')->attr('href');
             $mob_phone = get_content('https://m.avito.ru'.$mob_href.'?async');
-            //var_dump($mob_content);
             foreach ($contents as $content) {
                 $pqContent = pq($content);
                 //$id = 1;
@@ -101,19 +93,14 @@ function getSinglePage($n,$numPage)
                 $date = $pqContent->find('div.item-add-date')->getString();
                 $address = $pqContent->find('span.info-text.user-address-text')->getString();
                 $addressString = $address;
-                //$CITY_TYPE = '';
-                var_dump($type);
                 $text = $address[0];
-
                 $main_str = $text;
-
                 $pos4 = strpos($main_str, 'посёлок') !== false;
                 $pos = strpos($main_str, 'пос.') !== false;
                 $pos1 = strpos($main_str, 'п.') !== false;
                 $pos3 = strpos($main_str, 'сдт') !== false;
                 $town = strpos($main_str, 'г.') !== false;
                 $town1 = strpos($main_str, 'город') !== false;
-
                 if ($pos && $town) {
                     $CITY_TYPE='003';
                 } else {
@@ -129,7 +116,6 @@ function getSinglePage($n,$numPage)
                 //$time = $pqContent->find('div.item-add-date')->attr('data-date');
                 $bind++;
             }
-//var_dump($address);
             $filename = 'avito.xlsx';
             global $obj;
             if (file_exists($filename)) {
@@ -145,23 +131,11 @@ function getSinglePage($n,$numPage)
                 $page->setCellValue("F1", "CITY_TYPE");
                 $page->setCellValue("G1", "REGION");
                 $page->setCellValue("H1", " ADDRESS");
-//                $page->setCellValue("H1", "ADDRESS");
-//                $page->setCellValue("I1", "1");
                 $page->setCellValue("I1", "PHONE");
                 $page->setCellValue("J1", "REF");
             }
-//            if (trim($param[0])=='Квартиры'){
-//                $param[0]='2001003000';
-//                $PURPOSE_CODE = '204004000000';
-//            }
-//            if ($param[0]=='Дома, дачи, коттеджи'){
-//                $param[0]='2001001000';
-//            }
             $obj = [trim($n), trim($param[0]),trim($type[0]), $date[0], trim($price[0]),$CITY_TYPE, '26',trim($addressString[0]),$mob_phone,'https://m.avito.ru' . $tags[$i]];
-            //$obj = [trim($n), trim($param[0]), $date[0], trim($price[0]),$CITY_TYPE, '26',trim($address[1]),trim($address[0]),'улица',$mob_phone,'https://m.avito.ru' . $tags[$i]];
-            var_dump($obj);
             $objPHPExcel->getActiveSheet(0)->fromArray($obj, NULL, 'A' . $n);
-
             $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
             $objWriter->save($filename);
 
@@ -170,26 +144,9 @@ function getSinglePage($n,$numPage)
     }
 }
 
-//function getads_avito_www($url,$html)
-//{
-/*    $pattern = "'<div class=\"item.{1,100} id=\"i(?<avito_id>.{7,12})\".*?<h3 .*? href=\"(?<href>.*?)\".*?>(?<title>.*?)</a>.*?<div class=\"about\">(?<price>.*?)<.*?v>(?<details>.*?)<div class=\"date c-2\">(?<data>.*?)</div>'si";*/
-//
-//    $titre=preg_match_all($pattern, $html, $ads) ;
-//    unset($ads[0]);
-//    for ($i=0;$i<count($ads["price"]);$i++)
-//    {
-//        $ads["price"][$i]=preg_replace('/[^\d]+/', '',$ads["price"][$i]);
-//        $ads["href"][$i]="https://www.avito.ru".$ads["href"][$i];
-//        $ads["details"][$i]=strip_tags($ads["details"][$i]);
-//    }
-//    return $ads;
-//}
-//$mainurl = 'https://m.avito.ru/stavropolskiy_kray/nedvizhimost?';
-//$e = getads_avito_www('https://m.avito.ru/kislovodsk/kvartiry/1-k_kvartira_35_m_23_et._638865793',get_content('https://m.avito.ru/kislovodsk/kvartiry/1-k_kvartira_35_m_23_et._638865793'));
-//var_dump($mainurl,$e);
 $t=2;
 $str=1;
-$max = 50;
+$max = 2200;
 while($t<$max)
 {
     getSinglePage($t,$str);
